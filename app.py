@@ -227,70 +227,73 @@ def main():
         return
 
     # ── Pick current card ──
-    card = words.iloc[idx]
-    if "Italiano → Tedesco" in direction or "Italiano → Inglese" in direction:
-        front_col = "Italiano"
-        back_col = "Tedesco" if "Tedesco" in direction else "Inglese"
-        front_value = card['italian']
-        back_value = card['german'] if "Tedesco" in direction else card['english']
-    else:
-        front_col = "Tedesco" if "Tedesco" in direction else "Inglese"
-        back_col = "Italiano"
-        front_value = card['german'] if "Tedesco" in direction else card['english']
-        back_value = card['italian']
+    if idx < len(words):
+        card = words.iloc[idx]
+        if "Italiano → Tedesco" in direction or "Italiano → Inglese" in direction:
+            front_col = "Italiano"
+            back_col = "Tedesco" if "Tedesco" in direction else "Inglese"
+            front_value = card.get('italian', 'N/A')
+            back_value = card.get('german', 'N/A') if "Tedesco" in direction else card.get('english', 'N/A')
+        else:
+            front_col = "Tedesco" if "Tedesco" in direction else "Inglese"
+            back_col = "Italiano"
+            front_value = card.get('german', 'N/A') if "Tedesco" in direction else card.get('english', 'N/A')
+            back_value = card.get('italian', 'N/A')
 
-    # ── Display progress ──
-    total_cards = len(words)
-    st.progress(idx / total_cards)
-    st.markdown(f"Card {idx + 1} of {total_cards}")
+        # ── Display progress ──
+        total_cards = len(words)
+        st.progress(idx / total_cards)
+        st.markdown(f"Card {idx + 1} of {total_cards}")
 
-    # ── Show the prompt (front) ──
-    st.markdown(
-        f"<div style='font-size:20px; color:#555;'>{front_col}:</div>"
-        f"<div style='font-size:28px; font-weight:bold; margin:10px 0;'>{front_value}</div>",
-        unsafe_allow_html=True
-    )
-
-    # ── Show‐answer step ──
-    if not st.session_state.show_answer:
-        mostra_help = None if theme == "Dark" else "Clicca per mostrare la risposta"
-        st.button(
-            "🔍 Mostra la risposta",
-            key="show",
-            on_click=reveal_answer,
-            help=mostra_help
-        )
-
-    # ── Feedback step ──
-    else:
+        # ── Show the prompt (front) ──
         st.markdown(
-            f"<div style='font-size:20px; color:#555;'>{back_col}:</div>"
-            f"<div style='font-size:28px; font-weight:bold; color:green; margin:10px 0;'>{back_value}</div>",
+            f"<div style='font-size:20px; color:#555;'>{front_col}:</div>"
+            f"<div style='font-size:28px; font-weight:bold; margin:10px 0;'>{front_value}</div>",
             unsafe_allow_html=True
         )
-        # Disable tooltips in dark mode
-        right_help = None if theme == "Dark" else "Crepi il lupo 🐺"
-        wrong_help = None if theme == "Dark" else "Il lupo ti ha mangiato 🐺"
-        # center the two feedback buttons
-        blank1, middle, blank2 = st.columns([1, 2, 1])
-        with middle:
-            c1, c2 = st.columns(2, gap="small")
-            with c1:
-                st.button(
-                    "✅ Corretto",
-                    key="right",
-                    use_container_width=True,
-                    on_click=partial(mark_performance, front_value, back_value, "right"),
-                    help=right_help
-                )
-            with c2:
-                st.button(
-                    "❌ Sbagliato",
-                    key="wrong",
-                    use_container_width=True,
-                    on_click=partial(mark_performance, front_value, back_value, "wrong"),
-                    help=wrong_help
-                )
+
+        # ── Show‐answer step ──
+        if not st.session_state.show_answer:
+            mostra_help = None if theme == "Dark" else "Clicca per mostrare la risposta"
+            st.button(
+                "🔍 Mostra la risposta",
+                key="show",
+                on_click=reveal_answer,
+                help=mostra_help
+            )
+
+        # ── Feedback step ──
+        else:
+            st.markdown(
+                f"<div style='font-size:20px; color:#555;'>{back_col}:</div>"
+                f"<div style='font-size:28px; font-weight:bold; color:green; margin:10px 0;'>{back_value}</div>",
+                unsafe_allow_html=True
+            )
+            # Disable tooltips in dark mode
+            right_help = None if theme == "Dark" else "Crepi il lupo 🐺"
+            wrong_help = None if theme == "Dark" else "Il lupo ti ha mangiato 🐺"
+            # center the two feedback buttons
+            blank1, middle, blank2 = st.columns([1, 2, 1])
+            with middle:
+                c1, c2 = st.columns(2, gap="small")
+                with c1:
+                    st.button(
+                        "✅ Corretto",
+                        key="right",
+                        use_container_width=True,
+                        on_click=partial(mark_performance, front_value, back_value, "right"),
+                        help=right_help
+                    )
+                with c2:
+                    st.button(
+                        "❌ Sbagliato",
+                        key="wrong",
+                        use_container_width=True,
+                        on_click=partial(mark_performance, front_value, back_value, "wrong"),
+                        help=wrong_help
+                    )
+    else:
+        st.error("Index out of bounds. Please check the session state.")
 
     st.markdown("---")
 
