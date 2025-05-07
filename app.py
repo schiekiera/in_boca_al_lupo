@@ -141,12 +141,13 @@ def main():
         max_value=max_words,
         value=min(10, max_words)  # Default to 10 or max_words if less than 10
     )
-
+    
     # Shuffle and select the number of words based on the slider
-    if 'words' not in st.session_state or len(st.session_state.words) != num_words:
+    if 'words' not in st.session_state or 'initial_sample' not in st.session_state or st.session_state.initial_sample != num_words:
         st.session_state.words = data.sample(n=num_words).reset_index(drop=True)
         st.session_state.index = 0  # Reset index for new session
         st.session_state.performance = {}  # Reset performance for new session
+        st.session_state.initial_sample = num_words  # Track the initial sample size
 
     # ── Choose language pair ──
     language_pair = st.radio(
@@ -215,14 +216,6 @@ def main():
         st.markdown("### 📈 Word Performance")
         st.table(perf_df)
 
-        # Create a donut chart
-        fig = px.pie(
-            names=["Correct", "Incorrect"],
-            values=[total_right, total_wrong],
-            hole=0.4,  # This creates the donut shape
-            title="Performance Summary"
-        )
-        st.plotly_chart(fig)
 
         if st.button("Start New Session"):
             st.session_state.words = data.sample(frac=1).reset_index(drop=True)
@@ -298,17 +291,6 @@ def main():
                     on_click=partial(mark_performance, front_value, back_value, "wrong"),
                     help=wrong_help
                 )
-
-        # Update and display the performance chart
-        total_right = sum(v["right"] for v in st.session_state.performance.values())
-        total_wrong = sum(v["wrong"] for v in st.session_state.performance.values())
-        fig = px.pie(
-            names=["Correct", "Incorrect"],
-            values=[total_right, total_wrong],
-            hole=0.4,
-            title="Performance Summary"
-        )
-        st.plotly_chart(fig)
 
     st.markdown("---")
 
