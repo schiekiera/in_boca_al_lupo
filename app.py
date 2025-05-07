@@ -164,7 +164,7 @@ def main():
         # reset deck when language pair changes
         st.session_state.index = 0
         st.session_state.show_answer = False
-        st.session_state.performance = []
+        st.session_state.performance = [] 
 
     # ── Choose direction based on language pair ──
     if st.session_state.language_pair == "Italiano ↔ Tedesco":
