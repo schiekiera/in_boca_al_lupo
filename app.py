@@ -146,7 +146,7 @@ def main():
     if 'words' not in st.session_state or 'initial_sample' not in st.session_state or st.session_state.initial_sample != num_words:
         st.session_state.words = data.sample(n=num_words).reset_index(drop=True)
         st.session_state.index = 0  # Reset index for new session
-        st.session_state.performance = {}  # Reset performance for new session
+        st.session_state.performance = {}  # Ensure performance is a dictionary
         st.session_state.initial_sample = num_words  # Track the initial sample size
 
     # ── Choose language pair ──
@@ -164,7 +164,7 @@ def main():
         # reset deck when language pair changes
         st.session_state.index = 0
         st.session_state.show_answer = False
-        st.session_state.performance = [] 
+        st.session_state.performance = {}  # Ensure performance is a dictionary
 
     # ── Choose direction based on language pair ──
     if st.session_state.language_pair == "Italiano ↔ Tedesco":
@@ -186,7 +186,7 @@ def main():
         # reset deck when direction changes
         st.session_state.index = 0
         st.session_state.show_answer = False
-        st.session_state.performance = []
+        st.session_state.performance = {}  # Ensure performance is a dictionary
 
     # ── Initialize other state ──
     st.session_state.setdefault('index', 0)
